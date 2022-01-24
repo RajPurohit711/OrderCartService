@@ -9,7 +9,7 @@ public class OrderDto {
     private Long total;
     private Date date;
     private Long userId;
-    List<OrderItemDto> orderItems;
+    private List<OrderItemDto> orderItems;
 
     public String getId() {
         return id;

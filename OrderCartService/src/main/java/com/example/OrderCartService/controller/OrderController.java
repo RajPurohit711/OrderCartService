@@ -1,7 +1,6 @@
 package com.example.OrderCartService.controller;
 
-import com.example.OrderCartService.dto.OrderDto;
-import com.example.OrderCartService.dto.OrderEmailDto;
+import com.example.OrderCartService.dto.*;
 import com.example.OrderCartService.entity.Order;
 import com.example.OrderCartService.service.OrderService;
 import org.springframework.amqp.core.DirectExchange;
@@ -9,6 +8,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,12 +53,22 @@ public class OrderController {
     @RequestMapping(value = "/addOrder", method = {RequestMethod.POST, RequestMethod.PUT})
     void addOrder(@RequestBody OrderDto orderDto) {
         Order order = new Order();
-        orderEmailDto.setEmail("purohitraj4553@gmail.com");
-        orderEmailDto.setName("Raj Purohit");
-        rabbitTemplate.convertAndSend(exchange.getName(),"routing.OrderEmail",orderEmailDto);
+
+        List<OrderItemDto> orderItemDtos = orderDto.getOrderItems();
+        for(OrderItemDto orderItemDto : orderItemDtos) {
+            String url = "http://localhost:8082/product/getProduct/"+orderItemDto.getProductId()+"/"+orderItemDto.getMerchantId();
+            ProductDto productDto = new RestTemplate().getForObject(url, ProductDto.class);
+            orderItemDto.setPrice(productDto.getPrice());
+            orderItemDto.setName(productDto.getName());
+        }
+
+        String url = "http://localhost:8080/user/" + orderDto.getUserId();
+        UserDto userDto = new RestTemplate().getForObject(url,UserDto.class);
+        rabbitTemplate.convertAndSend(exchange.getName(),"routing.OrderEmail",userDto);
 
         BeanUtils.copyProperties(orderDto,order);
         orderService.addOrder(order);
+
     }
 
     @DeleteMapping(value = "/deleteOrder")

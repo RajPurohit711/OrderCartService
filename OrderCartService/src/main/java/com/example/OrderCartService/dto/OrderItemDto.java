@@ -1,13 +1,25 @@
 package com.example.OrderCartService.dto;
 
+import java.util.List;
+
 public class OrderItemDto {
 
     private String productId;
     private Long merchantId;
 
-    private String price;
+    private Long price;
 
     private int quantity;
+    private String name;
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getProductId() {
         return productId;
@@ -25,11 +37,11 @@ public class OrderItemDto {
         this.quantity = quantity;
     }
 
-    public String getPrice() {
+    public Long getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(Long price) {
         this.price = price;
     }
 
