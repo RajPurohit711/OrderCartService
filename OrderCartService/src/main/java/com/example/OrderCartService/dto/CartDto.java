@@ -1,29 +1,21 @@
 package com.example.OrderCartService.dto;
 
-import com.example.OrderCartService.entity.Cart;
 
 import java.util.List;
 
 public class CartDto {
 
-    private String id;
     private Long userId;
-    private List<CartIteamDto> cartItems;
+    private List<CartItemDto> cartItems;
     private Long total ;
 
-    public String getId() {
-        return id;
-    }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 
-    public List<CartIteamDto> getCartItems() {
+    public List<CartItemDto> getCartItems() {
         return cartItems;
     }
 
-    public void setCartItems(List<CartIteamDto> cartItems) {
+    public void setCartItems(List<CartItemDto> cartItems) {
         this.cartItems = cartItems;
     }
 
@@ -36,15 +28,15 @@ public class CartDto {
     }
 
     public void calculateTotal(){
-        CartIteamDto cartIteamDto = new CartIteamDto();
+        CartItemDto cartItemDto = new CartItemDto();
         total= 0L;
-        for(CartIteamDto cartIteamDto1 : cartItems){
-            total += cartIteamDto1.getPrice();
+        for(CartItemDto cartItemDto1 : cartItems){
+            total += cartItemDto1.getPrice();
         }
     }
 
-    public void addCartItem(CartIteamDto cartIteamDto){
-        cartItems.add(cartIteamDto);
+    public void addCartItem(CartItemDto cartItemDto){
+        cartItems.add(cartItemDto);
     }
 
     public Long getUserId() {
@@ -53,5 +45,9 @@ public class CartDto {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public void deleteCartItem(CartItemDto cartItemDto){
+        cartItems.remove(cartItemDto);
     }
 }

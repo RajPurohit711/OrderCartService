@@ -5,8 +5,8 @@ import com.example.OrderCartService.entity.Cart;
 public interface CartService {
 
     void save(Cart cart);
-    Cart get(String id);
-    void delete(String id);
+    Cart get(Long id);
+    void delete(Long id);
     Cart getCartByUserId(Long id);
 
 }
