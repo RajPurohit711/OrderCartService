@@ -4,6 +4,7 @@ import com.example.OrderCartService.dto.CartDto;
 import com.example.OrderCartService.dto.CartItemDto;
 import com.example.OrderCartService.dto.ProductDto;
 import com.example.OrderCartService.entity.Cart;
+import com.example.OrderCartService.repository.CartRepository;
 import com.example.OrderCartService.service.CartService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,14 @@ public class CartController {
 
     @Autowired
     CartService cartService;
+
+    @Autowired
+    CartRepository cartRepository;
+
+    @GetMapping()
+    List<Cart> getall(){
+        return cartRepository.findAll();
+    }
 
     @GetMapping(value = "/{id}")
     CartDto getCartByUserId(@PathVariable Long id){
@@ -61,6 +70,8 @@ public class CartController {
         cartService.save(cart);
     }
 
+
+
     @RequestMapping(value = "/addToCart",method = {RequestMethod.POST,RequestMethod.PUT})
     String addToCart(@RequestBody CartItemDto cartItemDto){
 
@@ -68,25 +79,34 @@ public class CartController {
         Cart cart = cartService.get(cartItemDto.getUserId());
         List<CartItemDto> cartItemDtos = cart.getCartItems();
         if(cartItemDtos==null){
+            System.out.println(cartItemDto.getUserId()+"if \n\n ");
             cart.setCartItems(new ArrayList<>());
+            List<CartItemDto> cartItemDtos1 = new ArrayList<>();
+            cartItemDtos1.add(cartItemDto);
+            cart.setCartItems(cartItemDtos1);
         }
         else {
 
+            System.out.println("else \n\n ");
 
+
+            boolean flag=false;
             for(CartItemDto cartItemDto1 : cartItemDtos){
+
                 if(cartItemDto1.getProductId().equals(cartItemDto.getProductId())){
+
                     if(cartItemDto1.getMerchantId().equals(cartItemDto.getMerchantId())){
+
                         cartItemDto1.setQuantity(cartItemDto.getQuantity()+cartItemDto1.getQuantity());
+                        flag=true;
+                        break;
                     }
-                    else
-                    {
-                        BeanUtils.copyProperties(cartItemDto,cartItemDto1);
-                    }
-                }
-                else {
-                    cart.addCartItem(cartItemDto);
                 }
             }
+            if(!flag) {
+                cart.addCartItem(cartItemDto);
+            }
+
 
         }
         
@@ -99,7 +119,6 @@ public class CartController {
             cartService.save(cart);
             return "Succeed";
         }
-        
     }
 
 }

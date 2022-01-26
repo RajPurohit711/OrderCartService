@@ -39,7 +39,7 @@ public class Cart {
     }
 
     public void addCartItem(CartItemDto cartItemDto){
-        this.addCartItem(cartItemDto);
+        this.cartItems.add(cartItemDto);
     }
 
 
