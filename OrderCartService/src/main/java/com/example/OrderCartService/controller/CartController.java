@@ -34,20 +34,20 @@ public class CartController {
         Cart cart = cartService.get(id);
 
 
-//        List<CartItemDto> cartItemDtos = cart.getCartItems();
+        List<CartItemDto> cartItemDtos = cart.getCartItems();
 
 
-//        for(CartItemDto cartItemDto : cartItemDtos ) {
-//          String url = "http://localhost:8082/product/getProduct/"+cartItemDto.getProductId()+"/"+cartItemDto.getMerchantId();
-//          ProductDto productDto = new RestTemplate().getForObject(url, ProductDto.class);
-//            cartItemDto.setPrice(productDto.getPrice());
-//            if(cartItemDto.getQuantity() > productDto.getStock()){
-//                cartItemDto.setQuantity(0L);
-//            }
-//
-//        }
+        for(CartItemDto cartItemDto : cartItemDtos ) {
+          String url = "http://localhost:8082/product/getProduct/"+cartItemDto.getProductId()+"/"+cartItemDto.getMerchantId();
+          ProductDto productDto = new RestTemplate().getForObject(url, ProductDto.class);
+            cartItemDto.setPrice(productDto.getPrice());
+            if(cartItemDto.getQuantity() > productDto.getStock()){
+                cartItemDto.setQuantity(0L);
+            }
 
-//        cart.setCartItems(cartItemDtos);
+        }
+
+        cart.setCartItems(cartItemDtos);
 
         CartDto cartDto = new CartDto();
         BeanUtils.copyProperties(cart,cartDto);
