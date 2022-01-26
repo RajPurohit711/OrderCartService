@@ -2,14 +2,11 @@ package com.example.OrderCartService.controller;
 
 import com.example.OrderCartService.dto.CartDto;
 import com.example.OrderCartService.dto.CartItemDto;
-import com.example.OrderCartService.dto.OrderItemDto;
 import com.example.OrderCartService.dto.ProductDto;
 import com.example.OrderCartService.entity.Cart;
 import com.example.OrderCartService.service.CartService;
-import net.minidev.json.writer.BeansMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,20 +25,20 @@ public class CartController {
         Cart cart = cartService.get(id);
 
 
-        List<CartItemDto> cartItemDtos = cart.getCartItems();
+//        List<CartItemDto> cartItemDtos = cart.getCartItems();
 
 
-        for(CartItemDto cartItemDto : cartItemDtos ) {
-            String url = "http://localhost:8082/product/getProduct/"+cartItemDto.getProductId()+"/"+cartItemDto.getMerchantId();
-            ProductDto productDto = new RestTemplate().getForObject(url, ProductDto.class);
-            cartItemDto.setPrice(productDto.getPrice());
-            if(cartItemDto.getQuantity() > productDto.getStock()){
-                cartItemDto.setQuantity(0L);
-            }
+//        for(CartItemDto cartItemDto : cartItemDtos ) {
+//          String url = "http://localhost:8082/product/getProduct/"+cartItemDto.getProductId()+"/"+cartItemDto.getMerchantId();
+//          ProductDto productDto = new RestTemplate().getForObject(url, ProductDto.class);
+//            cartItemDto.setPrice(productDto.getPrice());
+//            if(cartItemDto.getQuantity() > productDto.getStock()){
+//                cartItemDto.setQuantity(0L);
+//            }
+//
+//        }
 
-        }
-
-        cart.setCartItems(cartItemDtos);
+//        cart.setCartItems(cartItemDtos);
 
         CartDto cartDto = new CartDto();
         BeanUtils.copyProperties(cart,cartDto);
@@ -54,17 +51,44 @@ public class CartController {
         cartService.delete(id);
     }
 
+    @PostMapping(value = "/createCart")
+    void createCart(@RequestBody CartDto cartDto){
+        Cart cart = new Cart();
+        cartDto.setTotal(0L);
+        cartDto.setCartItems(null);
+        BeanUtils.copyProperties(cartDto,cart);
+
+        cartService.save(cart);
+    }
+
     @RequestMapping(value = "/addToCart",method = {RequestMethod.POST,RequestMethod.PUT})
     String addToCart(@RequestBody CartItemDto cartItemDto){
 
+
         Cart cart = cartService.get(cartItemDto.getUserId());
-        if(cart==null) {
-            cart = new Cart();
-            cart.setUserId(cartItemDto.getUserId());
+        List<CartItemDto> cartItemDtos = cart.getCartItems();
+        if(cartItemDtos==null){
             cart.setCartItems(new ArrayList<>());
-            cart.addCartItem(cartItemDto);
         }
-        cart.addCartItem(cartItemDto);
+        else {
+
+
+            for(CartItemDto cartItemDto1 : cartItemDtos){
+                if(cartItemDto1.getProductId().equals(cartItemDto.getProductId())){
+                    if(cartItemDto1.getMerchantId().equals(cartItemDto.getMerchantId())){
+                        cartItemDto1.setQuantity(cartItemDto.getQuantity()+cartItemDto1.getQuantity());
+                    }
+                    else
+                    {
+                        BeanUtils.copyProperties(cartItemDto,cartItemDto1);
+                    }
+                }
+                else {
+                    cart.addCartItem(cartItemDto);
+                }
+            }
+
+        }
         
         String url = "http://localhost:8082/product/getProduct/"+cartItemDto.getProductId()+"/"+cartItemDto.getMerchantId();
         ProductDto productDto = new RestTemplate().getForObject(url, ProductDto.class);

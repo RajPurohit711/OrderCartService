@@ -28,7 +28,6 @@ public class CartDto {
     }
 
     public void calculateTotal(){
-        CartItemDto cartItemDto = new CartItemDto();
         total= 0L;
         for(CartItemDto cartItemDto1 : cartItems){
             total += cartItemDto1.getPrice();

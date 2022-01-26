@@ -9,7 +9,7 @@ public class OrderItemDto {
 
     private Long price;
 
-    private int quantity;
+    private Long quantity;
     private String name;
 
 
@@ -29,11 +29,11 @@ public class OrderItemDto {
         this.productId = productId;
     }
 
-    public int getQuantity() {
+    public Long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Long quantity) {
         this.quantity = quantity;
     }
 
